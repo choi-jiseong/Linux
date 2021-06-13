@@ -1,0 +1,24 @@
+apache 서버 홈페이지 폴더 : /var/www/html
+
+각 사용자 홈페이지 가지게 하기 : /etc/httpd/conf.d/userdir.conf
+			      systemctl restart httpd
+			      setsebool -P httpd_enable_homedirs on
+			      chmod 711 /home/*
+			      사용자 홈으로가서 public_html 만들기
+			      그안에 index.html 추가
+
+oracle 관리자 비번 설정
+/opt/init.d/oracle-xe-18c configure
+
+c##없애기 : alter session set "_ORACLE_SCRIPT"=true;
+
+oracle 외부 허용
+/opt/oracle/product/dbhomeXE/network/admin tnsname.ora, listener.ora바꾸기
+/etc/init.d/oracle-xe-18c start
+port 열기
+
+mariadb관리자 비번설정 : /usr/bin/mysqladmin -u root password '비번';
+
+mariadb사용자 추가 : create user 'id'@'%' identified by '비번';
+
+우분투 개인 홈페이지 허용 : /etc/apache2/mods-available/userdir.conf 에서 수정

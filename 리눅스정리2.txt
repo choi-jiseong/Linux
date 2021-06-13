@@ -1,0 +1,132 @@
+vituralbox에서 제공하는 어댑터 모드 종류
+- nat : 리눅스에서 호스트에 접근 가능, 리눅스끼리 접근 x, 호스트에서 리눅스로 접근 x
+- nat network : 리눅스에서 호스트에 접근 가능, 리눅스끼리 접근 o, 호스트에서 리눅스로 접근 x
+- 브리지 어댑터 : 리눅스와 호스트가 동일한 레벨의 ip를 부여받고 통신 가능
+- inter network : 리눅스끼리 접근 가능
+- hostOnly 어댑터 : 호스트에서 리눅스에 접근 가능, 리눅스끼리 접근 가능, 리눅스에서 호스트에 접근 x
+
+웹 서버 : 클라이언트에서 서버로 들어오는 요청을 처리할 수 있는 프로그램 (apache 등)
+
+APM : Apache + PHP + MariaDB(MySQL)
+LAMP : Linux + Apache + MariaDB(MySQL) + PHP
+
+apache 서버의 패키지 이름 : httpd
+
+서비스를 관리할 때 사용하는 명령어 : systemctl
+서비스 상태 확인 : systemctl status 서비스이름
+서비스 시작 : systemctl start 서비스이름
+서비스 멈춤 : systemctl stop 서비스이름
+서비스 부팅시 자동 실행 : systemctl enable 서비스이름
+서비스 재시작 : systemctl restart 서비스이름
+
+방화벽
+- 데몬 : firewalld
+- 명령어 : firewall-cmd
+- zone : 범위를 나눈다?
+- defalut zone : public
+- 지금 적용되있는 zone : active zone
+- 방화벽 설정 후 재시작 : firewall-cmd --reload
+- 지금 적용중인 zone 확인 : firewall-cmd --get-active-zone
+- 지금 default zone 확인 : firewall-cmd --get-default-zone
+- 포트 허용 : firewall-cmd --zone=public --add-port=포트번호/tcp --permanent
+- --permanent : 리부팅시에도 자동 적용
+- http에서 사용하느 포트 허용 : firewall-cmd --zone=public --add-service=http --permanent\
+
+apache 서버의 홈 폴더 : /var/www/html
+/var/www/html 는 관리자만 사용 가능
+
+각 사용자 홈페이지 가지게 하기
+- /etc/httpd/conf.d/userdir.conf 파일을 열고 주석 설정
+- systemctl restart httpd 로 리부팅
+- setsebool -P httpd_enable_homedirs on
+- 각 사용자들의 홈들 711로 권한 변경 : chmod 711 /home/*
+- 각 사용자의 홈 디렉토리에 public_html 폴더 만듬
+- 폴더 안에 index.html 만들어준다
+- 접근 방법은 http://localhost/~사용자이름/index.html 또는 localhost에 ip주소
+
+응용 서버 : WAS라고도 하고 동적인 콘텐츠를 제공하는 서버, 주로 디비와 연동하는 서비스 제공 (php, tomcat 등)
+
+
+oracle 관리자 비번 설정
+- /etc/init.d/oracle-xe-18c configure
+
+oracle 사용하고 싶은 사용자는 자기 홈폴더에 .bash_profile을 수정하고 source .bash_profile을 한다
+- export ORACLE_HOME=/opt/oracle/product/18c/dbhomeXE
+  export TNS_ADMIN=$ORACLE_HOME/network/admin
+  export ORACLE_SID=XE
+  export NLS_LANG=AMERICAN_AMERICA. KO16KSC5601
+
+  PATH=$PATH:$ORACLE_HOME/bin
+
+oracle 실행은 sqlplus
+oracle 관리자 이름 :system, 비밀번호는 : 자기가 설정한 비번
+
+oracle 사용자 생성
+- create user c##아이디 identified by 비밀번호;
+
+oracle 권한 부여
+- grant connect, resource to c##아이디;
+
+c##을 없애지 않으면 로그인할 때도 붙여야한다
+- sqlplus c##아이디/비번
+
+c## 없애기
+- alter session set "_ORACLE_SCRIPT"=true;
+
+oracle 사용자가 테이블에 데이터 기록할 수 있도록 명령어 추가
+- alter user 아이디 quota 50M on USERS;
+
+oracle 외부접속 허용
+- /opt/oracle/product/18c/dbhomeXE/network/admin 폴더에 tnsnames.ora 파일에서 localhost적힌 자리에 hostOnly ip적어준다
+- /opt/oracle/product/18c/dbhomeXE/network/admin 폴더에 listener.ora 파일도 똑같이
+- /etc/init.d/oracle-xe-18c start 로 리부팅
+
+mariadb키기, 관리자 비밀번호 설정해주기
+- systemctl start mariadb
+- /usr/bin/mysqladmin -u root password '비밀번호'
+mysql_secure_installation 
+
+mariadb 로그인 및 설정
+- mysql -u root -p 입력
+- db생성 : create database 이름 character set utf8mb4 collate utf8mb4_general_ci;
+- 사용자 추가 : create user '아이디'@'%' identified by '비번';
+- 권한 부여 : grant select, delete, insert, create, drop, update on db이름.* to '아이디'@'%';
+	     flush privileges;
+
+mariadb 외부 허용
+- 포트 열어주고 방화벽 리로드 : firewall-cmd --zone=public --add-port=3306/tcp --permanent;
+
+고급언어, 어셈블리 언어 기계어로 바꿔주기
+-고급언어 : 컴파일러, 인터프리터
+- 어셈블리 언어: 어셈블러
+
+프로그램 : 하드웨어에 저장된 명령어의 집합
+태스크 : 컴퓨터 시스템에서 수행되는 하나의 작업
+다중작업(멀티태스크 or 멀티태스킹) : 동시에 처리하는 여러개의 작업
+
+서브루틴 : 메인 프로그램의 독립적인 일부분으로 필요할 때 호출하여 재사용할 수 있는 프로그램
+
+cpu 스케줄링 : 다중작업에서 어떤 작업에 cpu의 처리시간을 어느 정도 할당할지 결정하는 것
+스케줄러 : 운영체제의 일부로 여러 작업이 시스템 자원을 요청할 때 순서나 일정을 조정해주는 프로그램
+
+우선순위 방식 : 각 작업에 대해 우선순위를 정하고 그에 따라 시간 할당 비율을 조정
+
+스레드 : 명령을 수행하는 흐름의 단위
+멀티스레드 : 운영체제에서 여러 스레드를 동시에 관리하는 것
+
+프로세스 백그라운드로 실행하기
+- 명령어 다음에 &를 붙인다
+- 실행중인 프로세스 확인은 jobs명령어 사용
+- 전면으로 불러오고 싶으면 fg %번호
+
+프로세스 멈추기 : ctrl + z
+프로세스 종료 : ctrl +c
+핀 번호로 죽이기 : kill -9 pid (9는 완전종료 옵션)
+
+우분투에는 .bash_profile대신 .profile이 있다
+우분투에서는 관리자 모드를 할때 sudo 명령어를 사용해 관리자 모드 실행
+rpm과 같은 거 : dpkg
+yum과 같은 거 : apt-get
+우분투에서 아파치 서버 패키지의 이름 : apache2
+우분투에서 apache홈은 /var/www/html
+개인 홈페이지 허용 : /etc/apache2/mods-available/userdir.conf 열어서 UserDir disabled root 아랫줄에 UserDir enabled 사용자이름 
